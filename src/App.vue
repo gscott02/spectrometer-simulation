@@ -1,28 +1,25 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>UV-Vis Spectrometer Simulation</h1>
+
+    <!--<line-chart></line-chart>-->
+    <line-with-line></line-with-line>
+
+    <!--<b-button size="sm" variant="info">Test</b-button>-->
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+  //import LineChart from '@/components/LineChart'
+  import LineWithLine from "./components/LineWithLine";
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  export default {
+    name: 'App',
+    components: {
+      //LineChart,
+      LineWithLine
+    },
   }
-}
-</script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+</script>
