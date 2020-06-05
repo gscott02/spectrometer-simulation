@@ -12,12 +12,23 @@
           ></line-with-line>
         </b-card-body>
         <b-card-footer>
-          <b-button size="sm" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
-          <b-input-group size="sm" prepend="Integration Time" append="ms">
-            <b-form-input v-model="state.integration"></b-form-input>
-          </b-input-group>
-          <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
-          <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
+          <b-button size="sm" class="mb-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
+          <b-row class="mb-1">
+            <b-col lg="4">
+              <b-input-group size="sm" prepend="Integration Time" append="ms">
+                <b-form-input v-model="state.integration"></b-form-input>
+              </b-input-group>
+            </b-col>
+          </b-row>
+          <div>
+            <span v-if="state.lamp"><b-icon icon="brightness-high" variant="warning"></b-icon> Lamp On.</span>
+            <span v-else><b-icon icon="brightness-alt-low-fill" variant="dark"></b-icon> Lamp Off.</span>
+          </div>
+          <div v-show="state.lamp">
+            <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
+            <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
+            <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
+          </div>
         </b-card-footer>
       </b-card>
     </div>
@@ -48,6 +59,7 @@
           integration: 300,
           saturation: 3000,
           saturationWarning: false,
+          lowLampWarning: false,
         },
         wavelengths: wavelengths,
         lamps: [{
@@ -61,13 +73,35 @@
           concentration: 1.04e-5,
         }],
         yarr: new Array(wavelengths.length).fill(0),
+        /*datacollection: {
+          datasets: [
+            {
+              label: 'Intensity',
+              backgroundColor: '#249EBF',
+              borderColor: '#249EBF',
+              pointRadius: 0,
+              fill: false,
+              data: []//this.makePoints(),
+            }
+          ]
+        },*/
+        datasets: [
+          {
+            label: 'Intensity',
+            backgroundColor: '#249EBF',
+            borderColor: '#249EBF',
+            pointRadius: 0,
+            fill: false,
+            data: []//this.makePoints(),
+          }
+        ],
         options: {
           legend: false,
           tooltips: {
             intersect: false,
             axis: 'x',
             callbacks: {
-              title: function(tooltipItem, lampData) {
+              title: function(tooltipItem) {
                 return 'Wavelength: ' + tooltipItem[0].xLabel + ' nm'; //tooltipItem.yLabel;
               }
             },
@@ -135,6 +169,7 @@
         intensity = intensity.map(x => x * instrumentIntegration / intensityIntegrationReference);
         //Simulate saturated detector if intensity is greater than saturation threshold
         this.state.saturationWarning = intensity.some(x => x > instrumentSaturation);
+        this.state.lowLampWarning = Math.max(...intensity) < 0.5 * instrumentSaturation;
         intensity = intensity.map(x => x > instrumentSaturation ? instrumentSaturation : x);
         return intensity;
       }
@@ -145,24 +180,17 @@
       },
       datacollection() {
         return {
-          datasets: [
-            {
-              label: 'Intensity',
-              backgroundColor: '#249EBF',
-              borderColor: '#249EBF',
-              pointRadius: 0,
-              fill: false,
-              data: this.makePoints(),
-            }
-          ]
+          datasets: this.datasets,
         }},
     },
     watch: {
       integration() {
         this.startLamp();
+      },
+      yarr() {
+        this.datasets[0].data = this.makePoints();
       }
     }
   }
 
 </script>
-`

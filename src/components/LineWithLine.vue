@@ -48,11 +48,15 @@
             this.renderChart(this.chartData, this.options)
         },
         watch: {
-            chartData () {
-                this.renderChart(this.chartData, this.options)
-                //this.$data._chart.update(this.chartData, this.options)
-                //The update does not work correctly as suggested by the documentation, so calling render instead
-                //https://github.com/apertureless/vue-chartjs/issues/582
+            chartData: {
+                deep: true,
+                handler() {
+                    console.log("watch!");
+                    this.renderChart(this.chartData, this.options)
+                    //this.$data._chart.update(this.chartData, this.options)
+                    //The update does not work correctly as suggested by the documentation, so calling render instead
+                    //https://github.com/apertureless/vue-chartjs/issues/582
+                }
             },
             options () {
                 this.renderChart(this.chartData, this.options);
