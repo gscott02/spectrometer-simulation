@@ -16,6 +16,8 @@
           <b-input-group size="sm" prepend="Integration Time" append="ms">
             <b-form-input v-model="state.integration"></b-form-input>
           </b-input-group>
+          <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
+          <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
         </b-card-footer>
       </b-card>
     </div>
@@ -45,6 +47,7 @@
           background: false,
           integration: 300,
           saturation: 3000,
+          saturationWarning: false,
         },
         wavelengths: wavelengths,
         lamps: [{
@@ -124,14 +127,15 @@
       },
       initLamp() {
         let lamp = this.lamps[this.selected.lamp];
-        console.log(this.state.integration);
         let intensity = this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
         return intensity;
       },
       integratedIntensity(instrumentIntegration, instrumentSaturation, intensity, intensityIntegrationReference) {
+        //Set values based on integration time
         intensity = intensity.map(x => x * instrumentIntegration / intensityIntegrationReference);
+        //Simulate saturated detector if intensity is greater than saturation threshold
+        this.state.saturationWarning = intensity.some(x => x > instrumentSaturation);
         intensity = intensity.map(x => x > instrumentSaturation ? instrumentSaturation : x);
-        console.log(instrumentSaturation,instrumentIntegration);
         return intensity;
       }
     },
