@@ -41,52 +41,7 @@
     export default {
         extends: CustomLine,
 
-        props: ['chartData'],
-
-        data () {
-            return {
-
-                //Chart.js options that controls the appearance of the chart
-                options: {
-                    legend: false,
-                    tooltips: {
-                        intersect: false,
-                        axis: 'x',
-                        callbacks: {
-                            title: function(tooltipItem, lampData) {
-                                return 'Wavelength: ' + tooltipItem[0].xLabel + ' nm'; //tooltipItem.yLabel;
-                            }
-                        },
-                    },
-                    scales: {
-                        xAxes: [{
-                            type: 'linear',
-                            position: 'bottom',
-                            ticks: {
-                                min: 380,
-                                max: 900,
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Wavelength (nm)',
-                            }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Intensity',
-                            },
-                            /*ticks: {
-                                suggestedMax: 3500,
-                            }*/
-                        }],
-
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            }
-        },
+        props: ['chartData','options'],
 
         mounted () {
             //renderChart function renders the chart with the datacollection and options object.
@@ -94,13 +49,13 @@
         },
         watch: {
             chartData () {
-                console.log("watcher");
-                console.log(this.chartData);
-                this.options.animation = {duration: 0};
                 this.renderChart(this.chartData, this.options)
                 //this.$data._chart.update(this.chartData, this.options)
                 //The update does not work correctly as suggested by the documentation, so calling render instead
                 //https://github.com/apertureless/vue-chartjs/issues/582
+            },
+            options () {
+                this.renderChart(this.chartData, this.options);
             }
         }
     }
