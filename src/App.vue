@@ -73,7 +73,8 @@
           concentration: 1.04e-5,
         }],
         yarr: new Array(wavelengths.length).fill(0),
-        /*datacollection: {
+
+        chartCollection: {
           datasets: [
             {
               label: 'Intensity',
@@ -81,20 +82,22 @@
               borderColor: '#249EBF',
               pointRadius: 0,
               fill: false,
-              data: []//this.makePoints(),
+              data: [],//this.makePoints(),
             }
           ]
-        },*/
-        datasets: [
+        },
+
+        sets : [
           {
             label: 'Intensity',
             backgroundColor: '#249EBF',
             borderColor: '#249EBF',
             pointRadius: 0,
             fill: false,
-            data: []//this.makePoints(),
+            data: [],//this.makePoints(),
           }
         ],
+
         options: {
           legend: false,
           tooltips: {
@@ -138,13 +141,12 @@
     methods: {
       makePoints() {
         let pointsArr = [];
-        for(let i=0; i<this.yarr.length; i++) {
+        for (let i = 0; i < this.yarr.length; i++) {
           pointsArr.push({x: this.wavelengths[i], y: this.yarr[i].toFixed(3)});
         }
         return pointsArr;
       },
       startLamp() {
-
         let chartData = {
           label: 'Intensity',
           yAxisID: 'y-axis-0',
@@ -172,6 +174,16 @@
         this.state.lowLampWarning = Math.max(...intensity) < 0.5 * instrumentSaturation;
         intensity = intensity.map(x => x > instrumentSaturation ? instrumentSaturation : x);
         return intensity;
+      },
+      initDataCollection() {
+        let sets = this.sets;
+
+        sets[0].data = this.makePoints();
+
+        this.chartCollection = {
+          datasets: sets,
+        };
+
       }
     },
     computed: {
@@ -179,18 +191,29 @@
         return this.state.integration;
       },
       datacollection() {
+        return this.chartCollection;
+      }
+      /*datacollection() {
         return {
           datasets: this.datasets,
         }},
+      currentData() {
+        return this.makePoints();
+      }
     },
-    watch: {
-      integration() {
-        this.startLamp();
-      },
-      yarr() {
-        this.datasets[0].data = this.makePoints();
+       */
+    },
+      watch: {
+        integration() {
+          this.startLamp();
+        },
+        yarr() {
+          this.initDataCollection();
+        },
+        chartCollection() {
+          console.log("collection changed");
+        }
       }
     }
-  }
 
 </script>

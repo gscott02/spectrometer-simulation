@@ -49,7 +49,7 @@
         },
         watch: {
             chartData: {
-                deep: true,
+                //deep: true,
                 handler() {
                     console.log("watch!");
                     this.renderChart(this.chartData, this.options)
