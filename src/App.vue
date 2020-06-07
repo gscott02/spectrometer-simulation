@@ -9,27 +9,35 @@
           <line-with-line
                   :chart-data = "datacollection"
                   :options = "options"
+                  :width = "400"
+                  :height = "300"
           ></line-with-line>
         </b-card-body>
         <b-card-footer>
-          <b-button size="sm" class="mb-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
-          <b-button size="sm" variant="info" @click="test()">Test</b-button>
           <b-row class="mb-1">
-            <b-col lg="4">
-              <b-input-group size="sm" prepend="Integration Time" append="ms">
-                <b-form-input v-model="state.integration" type="number" step="20"></b-form-input>
-              </b-input-group>
+            <b-col md="6">
+              <b-button size="sm" class="mb-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
+              <b-row class="mb-1">
+                <b-col lg="8">
+                  <b-input-group size="sm" prepend="Integration Time" append="ms">
+                    <b-form-input v-model="state.integration" type="number" step="20"></b-form-input>
+                  </b-input-group>
+                </b-col>
+              </b-row>
+              <div>
+                <span v-if="state.lamp"><b-icon icon="brightness-high" variant="warning"></b-icon> Lamp On.</span>
+                <span v-else><b-icon icon="brightness-alt-low-fill" variant="dark"></b-icon> Lamp Off.</span>
+              </div>
+              <div v-show="state.lamp">
+                <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
+                <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
+                <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
+              </div>
+            </b-col>
+            <b-col md="6">
+              <b-button size="sm" class="mb-1" variant="info" @click="storeReference()">Store Reference</b-button>
             </b-col>
           </b-row>
-          <div>
-            <span v-if="state.lamp"><b-icon icon="brightness-high" variant="warning"></b-icon> Lamp On.</span>
-            <span v-else><b-icon icon="brightness-alt-low-fill" variant="dark"></b-icon> Lamp Off.</span>
-          </div>
-          <div v-show="state.lamp">
-            <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
-            <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
-            <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
-          </div>
         </b-card-footer>
       </b-card>
     </div>
@@ -38,7 +46,6 @@
 </template>
 
 <script>
-  //import LineChart from '@/components/LineChart'
   import LineWithLine from "./components/LineWithLine";
 
   export default {
@@ -73,7 +80,8 @@
           absorbance: [0.1898, 0.1924, 0.1976, 0.2015, 0.2041, 0.208, 0.2132, 0.2171, 0.2197, 0.2197, 0.2223, 0.2236, 0.2236, 0.2249, 0.2249, 0.2249, 0.2249, 0.2249, 0.2262, 0.2275, 0.2301, 0.2314, 0.234, 0.2366, 0.2392, 0.2431, 0.2457, 0.2483, 0.2509, 0.2522, 0.2548, 0.2561, 0.2574, 0.2574, 0.2574, 0.2574, 0.2561, 0.2548, 0.2535, 0.2522, 0.2496, 0.2444, 0.2418, 0.2392, 0.2366, 0.234, 0.2301, 0.2275, 0.2236, 0.221, 0.2171, 0.2145, 0.2106, 0.208, 0.2041, 0.2015, 0.1989, 0.1963, 0.1937, 0.1911, 0.1885, 0.1859, 0.182, 0.1794, 0.1768, 0.1742, 0.1729, 0.1703, 0.1677, 0.1638, 0.1625, 0.1599, 0.1573, 0.1547, 0.1534, 0.1508, 0.1495, 0.1469, 0.143, 0.1404, 0.1378, 0.1352, 0.1339, 0.1313, 0.1287, 0.1261, 0.1235, 0.1209, 0.1183, 0.117, 0.1144, 0.1131, 0.1105, 0.1092, 0.1066, 0.1053, 0.1027, 0.1001, 0.0975, 0.0949, 0.0936, 0.091, 0.0897, 0.0884, 0.0871, 0.0845, 0.0819, 0.0806, 0.0793, 0.078, 0.0767, 0.0741, 0.0728, 0.0715, 0.0689, 0.0676, 0.0663, 0.0663, 0.065, 0.0624, 0.0598, 0.0585, 0.0572, 0.0572, 0.0546, 0.0533, 0.052, 0.0507, 0.0494, 0.0481, 0.0468, 0.0455, 0.0442, 0.0442, 0.0429, 0.0429, 0.0416, 0.0403, 0.039, 0.039, 0.039, 0.0403, 0.0403, 0.0403, 0.0403, 0.0403, 0.0416, 0.0429, 0.0442, 0.0442, 0.0442, 0.0442, 0.0455, 0.0468, 0.0481, 0.0507, 0.0507, 0.0533, 0.0533, 0.0546, 0.0559, 0.0572, 0.0598, 0.0611, 0.0624, 0.065, 0.0663, 0.0689, 0.0702, 0.0728, 0.0741, 0.0754, 0.0754, 0.0767, 0.0793, 0.0819, 0.0845, 0.0871, 0.0897, 0.091, 0.091, 0.0923, 0.0949, 0.0988, 0.1027, 0.1079, 0.1092, 0.1105, 0.1131, 0.1157, 0.1196, 0.1222, 0.1248, 0.1287, 0.1313, 0.1339, 0.1365, 0.1404, 0.1456, 0.1495, 0.1534, 0.156, 0.1612, 0.1651, 0.1703, 0.1742, 0.1794, 0.1846, 0.1885, 0.1937, 0.1976, 0.2028, 0.208, 0.2145, 0.2197, 0.2249, 0.2314, 0.2366, 0.2431, 0.2496, 0.2548, 0.26, 0.2652, 0.2717, 0.2756, 0.2808, 0.286, 0.2925, 0.2977, 0.3042, 0.3094, 0.3159, 0.3211, 0.325, 0.3289, 0.3328, 0.338, 0.3419, 0.3471, 0.3536, 0.3588, 0.364, 0.3692, 0.3744, 0.3796, 0.3848, 0.3913, 0.3978, 0.4056, 0.4121, 0.4199, 0.4277, 0.4355, 0.4446, 0.4537, 0.4641, 0.4732, 0.4849, 0.4953, 0.5083, 0.52, 0.533, 0.5447, 0.559, 0.5733, 0.5876, 0.6019, 0.6175, 0.6344, 0.6513, 0.6682, 0.6851, 0.7007, 0.7189, 0.7371, 0.754, 0.7722, 0.7904, 0.8099, 0.8255, 0.8424, 0.8593, 0.8775, 0.8944, 0.9087, 0.923, 0.9347, 0.9464, 0.9568, 0.9672, 0.9737, 0.9802, 0.9854, 0.9893, 0.9906, 0.9906, 0.988, 0.9841, 0.9763, 0.9685, 0.9581, 0.9477, 0.9334, 0.9178, 0.9009, 0.8827, 0.8632, 0.8411, 0.819, 0.7956, 0.7722, 0.7462, 0.7215, 0.6942, 0.6682, 0.6422, 0.6162, 0.5889, 0.5616, 0.5369, 0.5109, 0.4862, 0.4602, 0.4355, 0.4121, 0.3887, 0.3666, 0.3471, 0.3263, 0.3081, 0.2912, 0.273, 0.2574, 0.2405, 0.2275, 0.2145, 0.2028, 0.1898, 0.1781, 0.1677, 0.1573, 0.1482, 0.1391, 0.1313, 0.1235, 0.1157, 0.1092, 0.1027, 0.0975, 0.0897, 0.0845, 0.0806, 0.0754, 0.0715, 0.0676, 0.0637, 0.0598, 0.0572, 0.0546, 0.052, 0.0481, 0.0455, 0.0429, 0.0403, 0.039, 0.0377, 0.0364, 0.0338, 0.0312, 0.0299, 0.0286, 0.0286, 0.0273, 0.026, 0.0247, 0.0234, 0.0221, 0.0221, 0.0221, 0.0208, 0.0208, 0.0182, 0.0182, 0.0169, 0.0169, 0.0169, 0.0169, 0.0169, 0.0156, 0.0156, 0.0143, 0.0156, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.013, 0.013, 0.013, 0.013, 0.013, 0.013, 0.0117, 0.0117, 0.0117, 0.013, 0.013, 0.013, 0.013, 0.013, 0.0117, 0.0117, 0.0117, 0.0117, 0.013, 0.0117, 0.0117, 0.0104, 0.0117, 0.0117, 0.0117, 0.0117, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0104, 0.0117, 0.0117, 0.0104, 0.0117, 0.0117, 0.0117, 0.0117, 0.0117, 0.0117, 0.0117, 0.0117, 0.013, 0.013, 0.013, 0.013, 0.0117, 0.013, 0.013, 0.013, 0.0143, 0.0143, 0.0143, 0.013, 0.013, 0.0117, 0.013, 0.013, 0.0143, 0.0143, 0.013, 0.0143, 0.013, 0.0143, 0.013, 0.0143, 0.0143, 0.0143, 0.013, 0.013, 0.013, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0156, 0.0169, 0.0169, 0.0169, 0.0156, 0.0169, 0.0169, 0.0169, 0.0169, 0.0156, 0.0156, 0.0156, 0.0156, 0.0169, 0.0156, 0.0156, 0.0156, 0.0156, 0.0169, 0.0169, 0.0156, 0.0156, 0.0156, 0.0169, 0.0169, 0.0156, 0.0156, 0.0156, 0.0156, 0.0143, 0.0143, 0.0143, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0169, 0.0169, 0.0169, 0.0169, 0.0169, 0.0182, 0.0182, 0.0182, 0.0182, 0.0182, 0.0182, 0.0182, 0.0169, 0.0169, 0.0169, 0.0169, 0.0156, 0.0156, 0.0156, 0.0156, 0.0169, 0.0156, 0.0169, 0.0169, 0.0169, 0.0156, 0.0169, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0156, 0.0143, 0.0143, 0.013, 0.0143, 0.0143, 0.0156, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0117, 0.0117, 0.0117, 0.013, 0.013, 0.013, 0.013, 0.013, 0.0143, 0.0143, 0.0143, 0.013, 0.013, 0.0143, 0.0143, 0.0143, 0.013, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0156, 0.0156, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0143, 0.0156, 0.013, 0.0117, 0.0117, 0.0117, 0.0104, 0.0091, 0.0104, 0.0117, 0.013, 0.0117, 0.0117, 0.0117, 0.0104, 0.0104, 0.0104, 0.0091, 0.0078, 0.0078, 0.0091, 0.0078, 0.0091, 0.0078, 0.0091, 0.0078, 0.0091, 0.0091, 0.0078, 0.0065, 0.0039],
           concentration: 1.04e-5,
         }],
-        yarr: new Array(wavelengths.length).fill(0),
+        currentIntensity: new Array(wavelengths.length).fill(0),
+        referenceIntensity: new Array(wavelengths.length).fill(0),
 
         datasets: [
           {
@@ -82,8 +90,16 @@
             borderColor: '#249EBF',
             pointRadius: 0,
             fill: false,
-            data: [],//new Array(this.wavelengths.length).fill(0),
-          }
+            data: [],
+          },
+          {
+            label: 'Reference Intensity',
+            backgroundColor: '#696969',
+            borderColor: '#696969',
+            pointRadius: 0,
+            fill: false,
+            data: [],
+          },
         ]
         ,
         options: {
@@ -130,24 +146,29 @@
       test() {
 
       },
-      makePoints() {
+      makePoints(yArr) {
         let pointsArr = [];
-        for (let i = 0; i < this.yarr.length; i++) {
-          pointsArr.push({x: this.wavelengths[i], y: this.yarr[i].toFixed(3)});
+        for (let i = 0; i < yArr.length; i++) {
+          pointsArr.push({x: this.wavelengths[i], y: yArr[i].toFixed(3)});
         }
         return pointsArr;
       },
       startLamp() {
-        this.yarr = this.initLamp();
+        this.currentIntensity = this.initLamp();
         this.state.lamp = true;
       },
       stopLamp() {
-        this.yarr = new Array(this.wavelengths.length).fill(0);
+        this.currentIntensity = new Array(this.wavelengths.length).fill(0);
         this.state.lamp = false;
       },
       initLamp() {
         let lamp = this.lamps[this.selected.lamp];
         return this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
+      },
+      storeReference() {
+        let set = this.datasets[1];
+        set.data = this.makePoints(this.currentIntensity);
+        this.datasets.splice(1,1,set);
       },
       integratedIntensity(instrumentIntegration, instrumentSaturation, intensity, intensityIntegrationReference) {
         //Set values based on integration time
@@ -173,11 +194,16 @@
       integration() {
         this.startLamp();
       },
-      yarr() {
+      currentIntensity() {
         let set = this.datasets[0];
-        set.data = this.makePoints();
+        set.data = this.makePoints(this.currentIntensity);
         this.datasets.splice(0,1,set);
       }
+    },
+    mounted() {
+      let set = this.datasets[0];
+      set.data = this.makePoints(this.currentIntensity);
+      this.datasets.splice(0,1,set);
     }
   }
 
