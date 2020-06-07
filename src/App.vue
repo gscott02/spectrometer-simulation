@@ -14,30 +14,33 @@
           ></line-with-line>
         </b-card-body>
         <b-card-footer>
-          <b-row class="mb-1">
-            <b-col md="6">
-              <b-button size="sm" class="mb-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
+          <b-card-group>
+            <b-card title="Instrument Settings">
+              <b-button size="sm" class="mb-1 mr-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
+              <b-button size="sm" class="mb-1" :disabled="!state.lamp" variant="info" @click="storeReference()">Store Reference</b-button>
               <b-row class="mb-1">
-                <b-col lg="8">
+                <b-col lg="12">
                   <b-input-group size="sm" prepend="Integration Time" append="ms">
                     <b-form-input v-model="state.integration" type="number" step="20"></b-form-input>
                   </b-input-group>
                 </b-col>
               </b-row>
-              <div>
-                <span v-if="state.lamp"><b-icon icon="brightness-high" variant="warning"></b-icon> Lamp On.</span>
-                <span v-else><b-icon icon="brightness-alt-low-fill" variant="dark"></b-icon> Lamp Off.</span>
-              </div>
+              <div v-if="state.lamp"><b-icon icon="brightness-high" variant="warning"></b-icon> Lamp On.</div>
+              <div v-else><b-icon icon="brightness-alt-low-fill" variant="dark"></b-icon> Lamp Off.</div>
               <div v-show="state.lamp">
                 <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
                 <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
                 <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
               </div>
-            </b-col>
-            <b-col md="6">
-              <b-button size="sm" class="mb-1" variant="info" @click="storeReference()">Store Reference</b-button>
-            </b-col>
-          </b-row>
+              <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Spectrum Stored.</div>
+              <div v-else><b-icon icon="file-richtext" variant="dark"></b-icon> Reference Spectrum Stored.</div>
+            </b-card>
+            <b-card title="Dispaly Settings">
+
+            </b-card>
+            <b-card title="Sample Controls"></b-card>
+          </b-card-group>
+
         </b-card-footer>
       </b-card>
     </div>
@@ -68,6 +71,7 @@
           saturation: 3000,
           saturationWarning: false,
           lowLampWarning: false,
+          reference: false,
         },
         wavelengths: wavelengths,
         lamps: [{
@@ -143,9 +147,6 @@
       }
     },
     methods: {
-      test() {
-
-      },
       makePoints(yArr) {
         let pointsArr = [];
         for (let i = 0; i < yArr.length; i++) {
@@ -166,9 +167,12 @@
         return this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
       },
       storeReference() {
+        if(!this.state.lamp)
+          return;
         let set = this.datasets[1];
         set.data = this.makePoints(this.currentIntensity);
         this.datasets.splice(1,1,set);
+        this.state.reference = true;
       },
       integratedIntensity(instrumentIntegration, instrumentSaturation, intensity, intensityIntegrationReference) {
         //Set values based on integration time
