@@ -2,7 +2,7 @@
     // 1. Import Chart.js so you can use the global Chart object
     import Chart from 'chart.js'
     // 2. Import the `generateChart()` method to create the vue component.
-    import { generateChart, mixins } from 'vue-chartjs'
+    import { generateChart } from 'vue-chartjs'
 
     // 3. Extend on of the default charts
     // http://www.chartjs.org/docs/latest/developers/charts.html
@@ -34,7 +34,7 @@
 
     // 4. Generate the vue-chartjs component
     // First argument is the chart-id, second the chart type.
-    const CustomLine = generateChart('custom-line', 'LineWithLine')
+    const CustomLine = generateChart('custom-line', 'LineWithLine');
 
     // 5. Extend the CustomLine Component just like you do with the default vue-chartjs charts.
 
@@ -51,7 +51,6 @@
             chartData: {
                 //deep: true,
                 handler() {
-                    console.log("watch!");
                     this.renderChart(this.chartData, this.options)
                     //this.$data._chart.update(this.chartData, this.options)
                     //The update does not work correctly as suggested by the documentation, so calling render instead
@@ -60,7 +59,7 @@
             },
             options () {
                 this.renderChart(this.chartData, this.options);
-            }
+            },
         }
     }
 </script>

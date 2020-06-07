@@ -13,10 +13,11 @@
         </b-card-body>
         <b-card-footer>
           <b-button size="sm" class="mb-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
+          <b-button size="sm" variant="info" @click="test()">Test</b-button>
           <b-row class="mb-1">
             <b-col lg="4">
               <b-input-group size="sm" prepend="Integration Time" append="ms">
-                <b-form-input v-model="state.integration"></b-form-input>
+                <b-form-input v-model="state.integration" type="number" step="20"></b-form-input>
               </b-input-group>
             </b-col>
           </b-row>
@@ -74,30 +75,17 @@
         }],
         yarr: new Array(wavelengths.length).fill(0),
 
-        chartCollection: {
-          datasets: [
-            {
-              label: 'Intensity',
-              backgroundColor: '#249EBF',
-              borderColor: '#249EBF',
-              pointRadius: 0,
-              fill: false,
-              data: [],//this.makePoints(),
-            }
-          ]
-        },
-
-        sets : [
+        datasets: [
           {
             label: 'Intensity',
             backgroundColor: '#249EBF',
             borderColor: '#249EBF',
             pointRadius: 0,
             fill: false,
-            data: [],//this.makePoints(),
+            data: [],//new Array(this.wavelengths.length).fill(0),
           }
-        ],
-
+        ]
+        ,
         options: {
           legend: false,
           tooltips: {
@@ -105,7 +93,7 @@
             axis: 'x',
             callbacks: {
               title: function(tooltipItem) {
-                return 'Wavelength: ' + tooltipItem[0].xLabel + ' nm'; //tooltipItem.yLabel;
+                return 'Wavelength: ' + tooltipItem[0].xLabel + ' nm';
               }
             },
           },
@@ -139,6 +127,9 @@
       }
     },
     methods: {
+      test() {
+
+      },
       makePoints() {
         let pointsArr = [];
         for (let i = 0; i < this.yarr.length; i++) {
@@ -147,13 +138,6 @@
         return pointsArr;
       },
       startLamp() {
-        let chartData = {
-          label: 'Intensity',
-          yAxisID: 'y-axis-0',
-          //data: lampData,
-          pointRadius: 0,
-          fill: false,
-        };
         this.yarr = this.initLamp();
         this.state.lamp = true;
       },
@@ -163,8 +147,7 @@
       },
       initLamp() {
         let lamp = this.lamps[this.selected.lamp];
-        let intensity = this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
-        return intensity;
+        return this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
       },
       integratedIntensity(instrumentIntegration, instrumentSaturation, intensity, intensityIntegrationReference) {
         //Set values based on integration time
@@ -175,45 +158,27 @@
         intensity = intensity.map(x => x > instrumentSaturation ? instrumentSaturation : x);
         return intensity;
       },
-      initDataCollection() {
-        let sets = this.sets;
-
-        sets[0].data = this.makePoints();
-
-        this.chartCollection = {
-          datasets: sets,
-        };
-
-      }
     },
     computed: {
       integration() {
         return this.state.integration;
       },
       datacollection() {
-        return this.chartCollection;
-      }
-      /*datacollection() {
         return {
           datasets: this.datasets,
-        }},
-      currentData() {
-        return this.makePoints();
-      }
-    },
-       */
-    },
-      watch: {
-        integration() {
-          this.startLamp();
-        },
-        yarr() {
-          this.initDataCollection();
-        },
-        chartCollection() {
-          console.log("collection changed");
         }
+      },
+    },
+    watch: {
+      integration() {
+        this.startLamp();
+      },
+      yarr() {
+        let set = this.datasets[0];
+        set.data = this.makePoints();
+        this.datasets.splice(0,1,set);
       }
     }
+  }
 
 </script>
