@@ -109,6 +109,7 @@
                     saturationWarning: false,
                     lowLampWarning: false,
                     reference: false,
+                    sample: false,
                 },
                 wavelengths: wavelengths,
                 lamps: [{
@@ -288,6 +289,7 @@
             },
             insertSample() {
                 this.currentIntensity = this.samples[this.selected.sample].relativeIntensity;
+                this.state.sample = true;
             },
             integratedIntensity(instrumentIntegration, instrumentSaturation, intensity, intensityIntegrationReference) {
                 //Set values based on integration time
@@ -319,6 +321,15 @@
                 set = this.datasets[3];
                 set.data = this.makePoints(transmittanceToAbsorbance(percentTransmittance.map(x=>x/100)));
                 this.datasets.splice(3,1,set);
+            },
+            updateIntensityFromConcentration() {
+                if(!this.state.sample)
+                    return;
+                let abs = intensityToAbsorbance(this.samples[this.selected.sample].relativeIntensity, this.referenceIntensity);
+                console.log(this.concentration,this.samples[this.selected.sample].concentration);
+                abs = abs.map(x=> x* this.concentration / this.samples[this.selected.sample].concentration);
+                let intensity = absorbanceToIntensity(abs, this.referenceIntensity);
+                this.currentIntensity = intensity;
             }
         },
         computed: {
@@ -332,12 +343,16 @@
             },
             anyIntensity() {
                 return !(this.datasets[0].hidden && this.datasets[1].hidden);
+            },
+            concentration() {
+                return this.selected.concentration;
             }
         },
         watch: {
             integration() {
                 this.startLamp();
                 //TODO This causes an issue if the integration time is changed once a sample is loaded.
+                //It also allows the lamp to be started without the start button.
             },
             currentIntensity() {
                 this.updateCurrentSample();
@@ -346,7 +361,11 @@
                 let axis = this.options.scales.yAxes[0];
                 axis.display = this.anyIntensity;
                 this.options.scales.yAxes.splice(0,1,axis);
+            },
+            concentration() {
+                this.updateIntensityFromConcentration();
             }
+
         },
         mounted() {
             let set = this.datasets[0];
@@ -371,6 +390,14 @@
 
     function absorbanceToIntensity(abs,I0) {
         return transmittanceToIntensity(absorbanceToTransmittance(abs),I0);
+    }
+
+    function intensityToTransmittance(I,I0) {
+        return I.map((x,i) => x/I0[i]);
+    }
+
+    function intensityToAbsorbance(I,I0) {
+        return transmittanceToAbsorbance(intensityToTransmittance(I,I0));
     }
 
 </script>
