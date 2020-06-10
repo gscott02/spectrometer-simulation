@@ -30,6 +30,7 @@
                             <div v-show="state.lamp">
                                 <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
                                 <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
+                                <span v-else-if="state.referenceWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Changing the integration time after storing a reference will lead to undesirable behavior. Store a new reference spectrum.</span>
                                 <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
                             </div>
                             <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Spectrum Stored.</div>
@@ -112,6 +113,7 @@
                     saturation: 3000,
                     saturationWarning: false,
                     lowLampWarning: false,
+                    referenceWarning: false,
                     reference: false,
                     sample: false,
                 },
@@ -266,36 +268,9 @@
                 axis.display = !axis.display;
                 this.options.scales.yAxes.splice(i,1,axis);
             },
-            makePoints(yArr) {
-                let pointsArr = [];
-                for (let i = 0; i < yArr.length; i++) {
-                    pointsArr.push({x: this.wavelengths[i], y: yArr[i].toFixed(3)});
-                }
-                return pointsArr;
-            },
-            startLamp() {
-                this.currentIntensity = this.initLamp();
-                this.state.lamp = true;
-                this.initializeSampleIntensities();
-            },
-            stopLamp() {
-                this.currentIntensity = new Array(this.wavelengths.length).fill(0);
-                this.state.lamp = false;
-            },
             initLamp() {
                 let lamp = this.lamps[this.selected.lamp];
                 return this.integratedIntensity(this.state.integration, this.state.saturation, lamp.intensity, lamp.referenceIntegration);
-            },
-            storeReference() {
-                if(!this.state.lamp)
-                    return;
-                let set = this.datasets[1];
-                set.data = this.makePoints(this.currentIntensity);
-                this.datasets.splice(1,1,set);
-                this.state.reference = true;
-                this.referenceIntensity = this.currentIntensity;
-                this.state.sample = true;
-                this.updateCurrentSample();
             },
             initializeSampleIntensities() {
                 this.samples.forEach(s=>{
@@ -317,6 +292,34 @@
                 this.state.lowLampWarning = Math.max(...intensity) < 0.5 * instrumentSaturation;
                 intensity = intensity.map(x => x > instrumentSaturation ? instrumentSaturation : x);
                 return intensity;
+            },
+            makePoints(yArr) {
+                let pointsArr = [];
+                for (let i = 0; i < yArr.length; i++) {
+                    pointsArr.push({x: this.wavelengths[i], y: yArr[i].toFixed(3)});
+                }
+                return pointsArr;
+            },
+            startLamp() {
+                this.state.lamp = true;
+                this.updateLamp();
+                this.initializeSampleIntensities();
+            },
+            stopLamp() {
+                this.currentIntensity = new Array(this.wavelengths.length).fill(0);
+                this.state.lamp = false;
+            },
+            storeReference() {
+                if(!this.state.lamp)
+                    return;
+                let set = this.datasets[1];
+                set.data = this.makePoints(this.currentIntensity);
+                this.datasets.splice(1,1,set);
+                this.state.reference = true;
+                this.referenceIntensity = this.currentIntensity;
+                this.state.sample = true;
+                this.state.referenceWarning = false;
+                this.updateCurrentSample();
             },
             updateCurrentSample() {
                 //Intensity
@@ -351,6 +354,11 @@
                 abs = abs.map(x=> x* this.concentration / this.samples[this.selected.sample].concentration);
                 let intensity = absorbanceToIntensity(abs, this.referenceIntensity);
                 this.currentIntensity = intensity;
+            },
+            updateLamp() {
+                if(!this.state.lamp)
+                    return;
+                this.currentIntensity = this.initLamp();
             }
         },
         computed: {
@@ -374,9 +382,10 @@
         },
         watch: {
             integration() {
-                this.startLamp();
+                this.updateLamp();
+                if(this.state.reference)
+                    this.state.referenceWarning = true;
                 //TODO This causes an issue if the integration time is changed once a sample is loaded.
-                //It also allows the lamp to be started without the start button.
             },
             currentIntensity() {
                 this.updateCurrentSample();
