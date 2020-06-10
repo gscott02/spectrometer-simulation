@@ -294,6 +294,8 @@
                 this.datasets.splice(1,1,set);
                 this.state.reference = true;
                 this.referenceIntensity = this.currentIntensity;
+                this.state.sample = true;
+                this.updateCurrentSample();
             },
             initializeSampleIntensities() {
                 this.samples.forEach(s=>{
@@ -338,8 +340,13 @@
                 this.datasets.splice(3,1,set);
             },
             updateIntensityFromConcentration() {
-                if(!this.state.sample)
+                if(this.concentration === 0) {
+                    this.currentIntensity = this.samples[this.selected.sample].relativeIntensity;
                     return;
+                }
+                if(!this.state.reference)
+                    return;
+
                 let abs = intensityToAbsorbance(this.samples[this.selected.sample].relativeIntensity, this.referenceIntensity);
                 abs = abs.map(x=> x* this.concentration / this.samples[this.selected.sample].concentration);
                 let intensity = absorbanceToIntensity(abs, this.referenceIntensity);
