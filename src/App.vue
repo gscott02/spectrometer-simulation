@@ -108,7 +108,7 @@
                 <h4>Integration Time</h4>
                 <p>The integration time is the length of time over which the detector is exposed to light for a measurement.  Longer times can increase the signal-to-noise ratio, but also slow the measurement frequency.  If the integration time is too long, the detector becomes saturated and can no longer distinguish differences in light intensity. If the integration time is too short, the signal-to-noise ratio will be low.</p>
                 <h4>Reference Spectrum</h4>
-                <p>Transmittance and absorbance are quantities that are measured relative to a reference measurement. The light output from the lamp across the spectrum is not uniform, the cuvette aborbs and scatters light, and the solvent absorbs and scatters light. For these reasons, a reference with only the cuvette and solvent is stored and used to compute the transmittance and absorbance by comparing the relative intensity of the sample to the reference intensity at each wavelength.</p>
+                <p>Transmittance and absorbance are quantities that are computed by comparing to a reference measurement. The light output from the lamp across the spectrum is not uniform, the cuvette aborbs and scatters light, and the solvent absorbs and scatters light. For these reasons, a reference with only the cuvette and solvent is stored and used to compute the transmittance and absorbance by comparing the relative intensity of the sample to the reference intensity at each wavelength.</p>
             </div>
         </b-sidebar>
 
