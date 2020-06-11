@@ -30,7 +30,6 @@
                             <div v-show="state.lamp">
                                 <span v-if="state.saturationWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Detector Saturated.  Try changing the integration time.</span>
                                 <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
-                                <span v-else-if="state.referenceWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Changing the integration time after storing a reference will lead to undesirable behavior. Store a new reference spectrum.</span>
                                 <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
                             </div>
                             <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Spectrum Stored.</div>
@@ -115,6 +114,7 @@
                     lowLampWarning: false,
                     referenceWarning: false,
                     reference: false,
+                    referenceIntegration: 0,
                     sample: false,
                 },
                 wavelengths: wavelengths,
@@ -319,6 +319,7 @@
                 this.referenceIntensity = this.currentIntensity;
                 this.state.sample = true;
                 this.state.referenceWarning = false;
+                this.state.referenceIntegration = this.state.integration;
                 this.updateCurrentSample();
             },
             updateCurrentSample() {
@@ -383,9 +384,12 @@
         watch: {
             integration() {
                 this.updateLamp();
-                if(this.state.reference)
+                if(this.state.reference && this.state.referenceIntegration !== this.state.integration)
                     this.state.referenceWarning = true;
-                //TODO This causes an issue if the integration time is changed once a sample is loaded.
+                if(this.state.referenceWarning && this.state.referenceIntegration == this.state.integration)
+                    this.state.referenceWarning = false;
+                this.initializeSampleIntensities();
+                this.insertSample();
             },
             currentIntensity() {
                 this.updateCurrentSample();
