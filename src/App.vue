@@ -15,7 +15,10 @@
                 </b-card-body>
                 <b-card-footer>
                     <b-card-group>
-                        <b-card title="Instrument Settings">
+                        <b-card >
+                            <b-card-title >
+                                Calibration <b-button size="sm" class="mb-1" variant="light" v-b-toggle.sidebar-calibration><b-icon-question-square></b-icon-question-square><span class="sr-only">Help</span></b-button>
+                            </b-card-title>
                             <b-button size="sm" class="mb-1 mr-1" variant="info" @click="state.lamp ? stopLamp() : startLamp()">{{state.lamp ? 'Stop' : 'Start'}} Lamp</b-button>
                             <b-button size="sm" class="mb-1" :disabled="!state.lamp" variant="info" @click="storeReference()">Store Reference</b-button>
                             <b-row class="mb-1">
@@ -32,7 +35,7 @@
                                 <span v-else-if="state.lowLampWarning"><b-icon icon="exclamation-circle-fill" variant="danger"></b-icon> Signal is low which will result in a low signal-to-noise ratio.  Try changing the integration time.</span>
                                 <span v-else><b-icon icon="check-circle-fill" variant="success"></b-icon> Instrument Okay.</span>
                             </div>
-                            <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Spectrum Stored.</div>
+                            <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Stored.</div>
                             <div v-else><b-icon icon="file-richtext" variant="dark"></b-icon> Reference Spectrum Stored.</div>
                         </b-card>
                         <b-card title="Display Settings">
@@ -63,6 +66,8 @@
                                            @change="toggleHideForDataSet(3); toggleAxis(2);"
                                            :labels="true"
                             ></toggle-button> Sample Absorbance
+                            <br/>
+
                         </b-card>
                         <b-card title="Sample Controls">
                             <div>
@@ -83,6 +88,26 @@
                 </b-card-footer>
             </b-card>
         </div>
+
+        <b-sidebar
+                id="sidebar-calibration"
+                title="Instrument Calibration"
+                bg-variant="dark"
+                text-variant="light"
+                backdrop
+                shadow
+        >
+            <div class="px-3 py-2">
+                <p>
+                    The calibration settings allow you to control the lamp, the detector settings, and to store a reference spectrum for use in determining transmittance and absorbance.
+                </p>
+
+                <h4>Integration Time</h4>
+                <p>The integration time is the length of time over which the detector is exposed to light for a measurement.  Longer times can increase the signal-to-noise ratio, but also slow the measurement frequency.  If the integration time is too long, the detector becomes saturated and can no longer distinguish differences in light intensity. If the integration time is too short, the signal-to-noise ratio will be low.</p>
+                <h4>Reference Spectrum</h4>
+                <p>Transmittance and absorbance are quantities that are measured relative to a reference measurement. The light output from the lamp across the spectrum is not uniform, the cuvette aborbs and scatters light, and the solvent absorbs and scatters light. For these reasons, a reference with only the cuvette and solvent is stored and used to compute the transmittance and absorbance by comparing the relative intensity of the sample to the reference intensity at each wavelength.</p>
+            </div>
+        </b-sidebar>
 
     </div>
 </template>
@@ -151,6 +176,7 @@
                         backgroundColor: '#249EBF',
                         borderColor: '#249EBF',
                         pointRadius: 0,
+                        pointStyle: 'line',
                         fill: false,
                         data: [],
                     },
@@ -159,7 +185,9 @@
                         label: 'Reference Intensity',
                         backgroundColor: '#696969',
                         borderColor: '#696969',
+                        borderDash: [10, 10],
                         pointRadius: 0,
+                        pointStyle: 'line',
                         fill: false,
                         data: [],
                     },
@@ -169,7 +197,9 @@
                         yAxisID: 'y-axis-1',
                         backgroundColor: '#c30009',
                         borderColor: '#c30009',
+                        borderDash: [20, 5],
                         pointRadius: 0,
+                        pointStyle: 'line',
                         fill: false,
                         data: []
                     },
@@ -179,7 +209,9 @@
                         yAxisID: 'y-axis-2',
                         backgroundColor: '#2b88c3',
                         borderColor: '#2b88c3',
+                        borderDash: [15, 3, 3, 3],
                         pointRadius: 0,
+                        pointStyle: 'line',
                         fill: false,
                         data: []
                     }
