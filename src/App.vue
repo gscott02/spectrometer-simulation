@@ -81,7 +81,7 @@
                             <b-row class="mb-1">
                                 <b-col lg="12">
                                     <b-input-group size="sm" prepend="Concentration" append="μM">
-                                        <b-form-input v-model="selected.concentration" type="number" step="20" :disabled="selected.sample===0"></b-form-input>
+                                        <b-form-input v-model="selected.concentration" type="number" step="1" :disabled="selected.sample===0"></b-form-input>
                                     </b-input-group>
                                 </b-col>
                             </b-row>
