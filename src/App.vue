@@ -38,7 +38,10 @@
                             <div v-if="!state.reference"><b-icon icon="file" variant="dark"></b-icon> No Reference Stored.</div>
                             <div v-else><b-icon icon="file-richtext" variant="dark"></b-icon> Reference Spectrum Stored.</div>
                         </b-card>
-                        <b-card title="Display Settings">
+                        <b-card>
+                            <b-card-title >
+                                Display Settings <b-button size="sm" class="mb-1" variant="light" v-b-toggle.sidebar-display><b-icon-question-square></b-icon-question-square><span class="sr-only">Help</span></b-button>
+                            </b-card-title>
                             <toggle-button id="toggleIntensity"
                                            :value="!datasets[0].hidden"
                                            :sync="true"
@@ -106,6 +109,36 @@
                 <p>The integration time is the length of time over which the detector is exposed to light for a measurement.  Longer times can increase the signal-to-noise ratio, but also slow the measurement frequency.  If the integration time is too long, the detector becomes saturated and can no longer distinguish differences in light intensity. If the integration time is too short, the signal-to-noise ratio will be low.</p>
                 <h4>Reference Spectrum</h4>
                 <p>Transmittance and absorbance are quantities that are measured relative to a reference measurement. The light output from the lamp across the spectrum is not uniform, the cuvette aborbs and scatters light, and the solvent absorbs and scatters light. For these reasons, a reference with only the cuvette and solvent is stored and used to compute the transmittance and absorbance by comparing the relative intensity of the sample to the reference intensity at each wavelength.</p>
+            </div>
+        </b-sidebar>
+
+        <b-sidebar
+                id="sidebar-display"
+                title="Display Settings"
+                bg-variant="dark"
+                text-variant="light"
+                backdrop
+                shadow
+        >
+            <div class="px-3 py-2">
+                <p>
+                    The display settings allow you to control the different measurements.  Note that mousing over the chart will display the measured values at each wavelength.
+                </p>
+
+                <h4>Transmittance</h4>
+                <p>Transmittance at each wavelength is defined as <vue-mathjax formula='$$T=\frac{I_{sample}-I_{dark}}{I_{reference}}$$'></vue-mathjax>
+                    where <vue-mathjax formula='$I_{sample}$'></vue-mathjax> is the detector intensity with the sample,
+                    <vue-mathjax formula='$I_{dark}$'></vue-mathjax>
+                    is the detector intensity with the lamp off--assumed to be zero in this simulation--and
+                    <vue-mathjax formula='$I_{reference}$'></vue-mathjax> is the detector intensity from the stored reference.
+                </p>
+                <p>Percent transmittance is the transmittance times 100%.</p>
+                <h4>Absorbance</h4>
+                <p>
+                    The transmittance does not vary linearly as a function of concentration.  The absorbance is a calculated quantity defined such that it will vary linearly as a function of concentration, assuming the system obeys the Beer-Lambert Law.
+                    <vue-mathjax formula='$$A=-log(T)$$'></vue-mathjax>
+                    where log represents the base-10 logarithm.
+                </p>
             </div>
         </b-sidebar>
 
@@ -332,6 +365,11 @@
                 }
                 return pointsArr;
             },
+            renderMathJax() {
+                if (window.MathJax) {
+                    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, this.$refs.mathJaxEl]);
+                }
+            },
             startLamp() {
                 this.state.lamp = true;
                 this.updateLamp();
@@ -446,6 +484,7 @@
             this.datasets.splice(0,1,set);
 
             this.selected.concentration = this.samples[this.selected.sample].concentration;
+            this.renderMathJax();
         }
     }
 
