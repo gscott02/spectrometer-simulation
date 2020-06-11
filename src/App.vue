@@ -4,7 +4,7 @@
             <h1>UV-Vis Spectrometer Simulation</h1>
 
             <b-card>
-                <b-card-header>Detector Intensity</b-card-header>
+
                 <b-card-body>
                     <line-with-line
                             :chart-data = "datacollection"
