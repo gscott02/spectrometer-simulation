@@ -126,17 +126,17 @@
                 </p>
 
                 <h4>Transmittance</h4>
-                <p>Transmittance at each wavelength is defined as <vue-mathjax formula='$$T=\frac{I_{sample}-I_{dark}}{I_{reference}}$$'></vue-mathjax>
-                    where <vue-mathjax formula='$I_{sample}$'></vue-mathjax> is the detector intensity with the sample,
-                    <vue-mathjax formula='$I_{dark}$'></vue-mathjax>
-                    is the detector intensity with the lamp off--assumed to be zero in this simulation--and
-                    <vue-mathjax formula='$I_{reference}$'></vue-mathjax> is the detector intensity from the stored reference.
+                <p>Transmittance at each wavelength is defined as
+                    $$T=\frac{I_{sample}-I_{dark}}{I_{ref}}$$
+                    where $I_{sample}$ is the detector intensity with the sample,
+                    $I_{dark}$ is the detector intensity with the lamp off (assumed to be zero in this simulation), and
+                    $I_{ref}$ is the detector intensity from the stored reference.
                 </p>
                 <p>Percent transmittance is the transmittance times 100%.</p>
                 <h4>Absorbance</h4>
                 <p>
                     The transmittance does not vary linearly as a function of concentration.  The absorbance is a calculated quantity defined such that it will vary linearly as a function of concentration, assuming the system obeys the Beer-Lambert Law.
-                    <vue-mathjax formula='$$A=-log(T)$$'></vue-mathjax>
+                    $$A=-log(T)$$
                     where log represents the base-10 logarithm.
                 </p>
             </div>
@@ -365,11 +365,6 @@
                 }
                 return pointsArr;
             },
-            renderMathJax() {
-                if (window.MathJax) {
-                    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, this.$refs.mathJaxEl]);
-                }
-            },
             startLamp() {
                 this.state.lamp = true;
                 this.updateLamp();
@@ -484,7 +479,6 @@
             this.datasets.splice(0,1,set);
 
             this.selected.concentration = this.samples[this.selected.sample].concentration;
-            this.renderMathJax();
         }
     }
 
