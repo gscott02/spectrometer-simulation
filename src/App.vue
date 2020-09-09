@@ -162,6 +162,7 @@
                     lamp: 0,
                     sample: 0,
                     concentration: 0,
+                    test: 0
                 },
                 state: {
                     lamp: false,
