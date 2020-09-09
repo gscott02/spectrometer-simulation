@@ -329,7 +329,10 @@
 
                     },
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    chartArea: {
+                        backgroundColor: 'rgba(251, 85, 85, 0.4)',
+                    }
                 }
             }
         },
