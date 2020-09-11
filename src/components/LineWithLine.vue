@@ -38,7 +38,7 @@
             let helpers = Chart.helpers;
             let ctx = chart.chart.ctx;
             let chartArea = chart.chartArea;
-            window.test = chart;
+
             let axis0_width = chart.scales['y-axis-0'].width;
             let axis1_width = chart.scales['y-axis-1'].width;
             let axis2_width = chart.scales['y-axis-2'].width;
@@ -49,18 +49,16 @@
             let cw = chartArea.right-chartArea.left;
             let gw = (cw+aw-raw)*400/520;
 
-            window.test2 = {'law' : law, 'raw': raw, 'aw': aw, 'cw': cw, 'gw': gw};
-
             let grd = ctx.createLinearGradient(law, 0, gw, 0);  // 400/520 represents the fact that the visible spectrum is ~380-780 nm, but we are plotting 380-900 nm.
 
             for(let i=380; i<=780; i++) {
                 grd.addColorStop((i-380)/400, wavelengthToColor(i)[0]);
             }
-            //grd.addColorStop(gw, "white");
+
             grd.addColorStop(1, "white");
 
             ctx.save();
-            ctx.fillStyle = grd;//chart.config.options.chartArea.backgroundColor;
+            ctx.fillStyle = grd;
             ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
             ctx.restore();
         }
